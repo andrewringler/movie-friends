@@ -7,6 +7,8 @@
   
   "dependencies": {
 		"oauthsimple": "latest",
-		"request": "latest"
+		"request": "latest",
+	  "xml-stream": "latest",
+	  "underscore": "latest"
 	}
 }
