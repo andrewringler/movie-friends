@@ -54,22 +54,47 @@ function streamFullCatalogToJSON(input) {
 	xml.collect('link');
 	xml.collect('availability');
 	xml.on('updateElement: catalog_title', function(item) {
-		// console.log('new item')
-		// _u.each(item.link, function(link) {
-		// 	console.log('l='+util.inspect(link, false, null));
-		// });
-		// _.each([1, 2, 3], function(num){ alert(num); });
-		// 
-		// item.link
-		// 
-		console.log(util.inspect(item, false, null));
+		// we don't need all of the data, also since we are required to poll every 24hrs
+		// per Netflix service agreement we can always add more fields later tomorrow
+		var doc = {}
+		
+		doc.id = item.id; // ie http://api.netflix.com/catalog/titles/movies/70058932
+		doc.title = {};
+		doc.title.regular = item.title['$'].regular;
+		doc.title.short = item.title['$'].short;
+		doc.release_year = item.release_year;
+		doc.average_rating = item.average_rating;
+		doc.updated = item.updated;
+
+		// all entries do not seem to have all sizes, need to clean this
+		_u.each(item.link, function(link) {
+			if(link.hasOwnProperty('box_art')){
+				var box_arts = link.box_art.link;
+				var box_arty = _u.find(box_arts, function(box_art){
+					return box_art['$'].title == '197pix width box art';
+				});
+				doc.box_art = {};
+				doc.box_art['197'] = box_arty['$'].href;
+			}
+			
+			if(link.hasOwnProperty('delivery_formats')){
+				var delivery_formats = link.delivery_formats.availability;
+				var instant = _u.find(delivery_formats, function(delivery_format) {
+					return delivery_format.category[0]['$'].term == 'instant';
+				});
+				if(instant){
+					doc.instant = {}
+					doc.instant.runtime = instant.runtime;
+					doc.instant.available_from = instant['$'].available_from;
+					doc.instant.available_until = instant['$'].available_until;
+				}
+			}
+		});
+		
+		if(doc.instant) {
+			console.log('\n' + util.inspect(doc, false, null));			
+		}
 	});
-	// xml.on('endElement: catalog_title', function(item) {
-	// 	console.log('\n'+item.id);
-	// 	console.log(item.title['$'].regular);
-	// 	console.log(item.link[0].box_art);
-	// 	// console.log(util.inspect(item, false, null));
-	// });	
 }
 
 // getTitle('70058932');
