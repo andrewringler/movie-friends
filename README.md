@@ -1,7 +1,7 @@
 movie-friends
 =============
 
-WIP. Plan a movie night with Netflix streaming. If you are not me you probably should not be here.
+WIP. Plan a movie night with Netflix streaming. Work-in-progress. Learned the Netflix API (enough). Does not do anything yet though.
 
 ### Get Started
 
