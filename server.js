@@ -154,11 +154,10 @@ db.open(function(err, db) {
 	http.createServer(function (req, res) {
 	  res.writeHead(200, {'Content-Type': 'text/html'});
 	  res.end('<!DOCTYPE html><html><body><p>'
-		+'<h1>title '+movie.title.regular+'</h1>'
-		+'<h3>id '+movie.id+'</h3>'
-		+'<h3>rating '+movie.average_rating+'</h3>'
-		+'<h3>'+movie.release_year+'</h3>'
+		+'<h1>'+movie.title.regular+'</h1>'
 		+'<img src="'+movie.box_art['197']+'"/>'
+		+'<h3>'+movie.average_rating+'</h3>'
+		+'<h3>'+movie.release_year+'</h3>'
 		+'</p></body></html>');
 	}).listen(1337, '127.0.0.1');
 	console.log('Listening on http://127.0.0.1:1337/ ...');

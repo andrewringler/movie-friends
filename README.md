@@ -1,18 +1,20 @@
 movie-friends
 =============
 
-Plan a movie night with Netflix streaming
+WIP. Plan a movie night with Netflix streaming. If you are not me you probably should not be here.
 
 ### Get Started
 
-   install [nvm](https://github.com/creationix/nvm)
-   install [mongodb](http://www.mongodb.org/)
+ * install [nvm](https://github.com/creationix/nvm)
+ * install [mongodb](http://www.mongodb.org/)
 
-   * nvm use v0.8.11
-   * npm install
-   * mkdir -p data/db
-   * mongod --noauth --rest --dbpath data/db
-   * node server.js
+#### And then
+
+    > nvm use v0.8.11
+    > npm install
+    > mkdir -p data/db
+    > mongod --noauth --rest --dbpath data/db
+    > node server.js
    
 ### Notes
 
