@@ -128,3 +128,39 @@ function loadNetflixFullIntoMongoDb() {
 // getTitle('70058932');
 // db.netflixfull.find({'release_year': '2012', 'id': /.*movies.*/ }).count();
 
+Server = mongo.Server,
+Db = mongo.Db;
+
+var server = new Server('localhost', 27017, {auto_reconnect: true});
+var db = new Db('moviefriends', server);
+
+db.open(function(err, db) {
+  if(!err) {
+	console.log('Connected');
+	
+	var movie = {};
+	db.collection('netflixfull', {safe:true}, function(err, collection) {
+		if(err) throw err;
+		collection.findOne({'release_year': '2012', 'id': /.*movies.*/ }, function(error, item) {
+			console.log('\n' + util.inspect(item, false, null));
+			movie = item;
+		});
+	});
+	
+	// var movie = {};
+	// db.collection('netflixfull', {safe:true}, function(err, collection) {
+	// });
+	
+	http.createServer(function (req, res) {
+	  res.writeHead(200, {'Content-Type': 'text/html'});
+	  res.end('<!DOCTYPE html><html><body><p>'
+		+'<h1>title '+movie.title.regular+'</h1>'
+		+'<h3>id '+movie.id+'</h3>'
+		+'<h3>rating '+movie.average_rating+'</h3>'
+		+'<h3>'+movie.release_year+'</h3>'
+		+'<img src="'+movie.box_art['197']+'"/>'
+		+'</p></body></html>');
+	}).listen(1337, '127.0.0.1');
+	console.log('Listening on http://127.0.0.1:1337/ ...');
+  }
+});
