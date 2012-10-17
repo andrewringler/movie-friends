@@ -104,23 +104,27 @@ function streamFullCatalogToJSON(input, collection) {
 	});
 }
 
+function loadNetflixFullIntoMongoDb() {
+	Server = mongo.Server,
+	Db = mongo.Db;
+
+	var server = new Server('localhost', 27017, {auto_reconnect: true});
+	var db = new Db('moviefriends', server);
+
+	db.open(function(err, db) {
+	  if(!err) {
+		console.log('Connected');
+		db.createCollection('netflixfull', function(err, collection) {
+			if(err) throw err;
+
+			console.log('Inserting Netflix data into database')
+			streamFullCatalogToJSON('data/netflix-full-catalog.Oct14.xml', collection);
+			console.log('Done.')		
+		});
+	  }
+	});	
+}
+
 // getTitle('70058932');
+// db.netflixfull.find({'release_year': '2012', 'id': /.*movies.*/ }).count();
 
-Server = mongo.Server,
-Db = mongo.Db;
-
-var server = new Server('localhost', 27017, {auto_reconnect: true});
-var db = new Db('moviefriends', server);
-
-db.open(function(err, db) {
-  if(!err) {
-	console.log('Connected');
-	db.createCollection('netflixfull', function(err, collection) {
-		if(err) throw err;
-		
-		console.log('Inserting Netflix data into database')
-		streamFullCatalogToJSON('data/netflix-full-catalog.Oct14.xml', collection);
-		console.log('Done.')		
-	});
-  }
-});
