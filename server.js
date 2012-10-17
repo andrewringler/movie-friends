@@ -4,7 +4,8 @@ var http = require('http'),
 	OAuthSimple = require('OAuthSimple'),
 	request = require('request'),
 	_u = require('underscore'),
-	XmlStream = require('xml-stream');
+	XmlStream = require('xml-stream'),
+	mongo = require('mongodb');
 
 function fullCatalogToFile() {
 	fs.readFile('./config.json', "utf8", function(error, result) {
@@ -46,13 +47,17 @@ function getTitle(titleId) {
 	});
 }
 
-function streamFullCatalogToJSON(input) {
+function streamFullCatalogToJSON(input, collection) {
 	var stream = fs.createReadStream(input);
 	var xml = new XmlStream(stream);
 
 	xml.collect('category');
 	xml.collect('link');
 	xml.collect('availability');
+	xml.on('error', function(error) {
+		console.log('Error ' + error);
+		throw error;
+	});
 	xml.on('updateElement: catalog_title', function(item) {
 		// we don't need all of the data, also since we are required to poll every 24hrs
 		// per Netflix service agreement we can always add more fields later tomorrow
@@ -66,8 +71,8 @@ function streamFullCatalogToJSON(input) {
 		doc.average_rating = item.average_rating;
 		doc.updated = item.updated;
 
-		// all entries do not seem to have all sizes, need to clean this
 		_u.each(item.link, function(link) {
+			// all entries do not seem to have all sizes, need to clean this
 			if(link.hasOwnProperty('box_art')){
 				var box_arts = link.box_art.link;
 				var box_arty = _u.find(box_arts, function(box_art){
@@ -92,10 +97,30 @@ function streamFullCatalogToJSON(input) {
 		});
 		
 		if(doc.instant) {
-			console.log('\n' + util.inspect(doc, false, null));			
+			// console.log('\n' + util.inspect(doc, false, null));			
+			collection.insert(doc);
+			console.log('INSERT ' + doc.id);
 		}
 	});
 }
 
 // getTitle('70058932');
-streamFullCatalogToJSON('data/play.xml');
+
+Server = mongo.Server,
+Db = mongo.Db;
+
+var server = new Server('localhost', 27017, {auto_reconnect: true});
+var db = new Db('moviefriends', server);
+
+db.open(function(err, db) {
+  if(!err) {
+	console.log('Connected');
+	db.createCollection('netflixfull', function(err, collection) {
+		if(err) throw err;
+		
+		console.log('Inserting Netflix data into database')
+		streamFullCatalogToJSON('data/netflix-full-catalog.Oct14.xml', collection);
+		console.log('Done.')		
+	});
+  }
+});

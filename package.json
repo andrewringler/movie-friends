@@ -9,6 +9,7 @@
 		"oauthsimple": "latest",
 		"request": "latest",
 	  "xml-stream": "latest",
-	  "underscore": "latest"
+	  "underscore": "latest",
+	  "mongodb": "latest"
 	}
 }
