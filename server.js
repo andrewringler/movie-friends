@@ -125,6 +125,10 @@ function loadNetflixFullIntoMongoDb() {
 	});	
 }
 
+function sanitize(s) {
+    return s.replace(/\//g, '').replace(/:/g, '').replace(/\./g, '');
+}
+
 // getTitle('70058932');
 // db.netflixfull.find({'release_year': '2012', 'id': /.*movies.*/ }).count();
 
@@ -132,34 +136,48 @@ Server = mongo.Server,
 Db = mongo.Db;
 
 var server = new Server('localhost', 27017, {auto_reconnect: true});
-var db = new Db('moviefriends', server);
+var db = new Db('moviefriends', server, {safe:true});
 
 db.open(function(err, db) {
   if(!err) {
 	console.log('Connected');
 	
-	var movie = {};
+	var html = '<!DOCTYPE html><html><body>';
+
+
 	db.collection('netflixfull', {safe:true}, function(err, collection) {
 		if(err) throw err;
-		collection.findOne({'release_year': '2012', 'id': /.*movies.*/ }, function(error, item) {
-			console.log('\n' + util.inspect(item, false, null));
-			movie = item;
+		var cursor = collection.find({'release_year': '2012', 'id': /.*movies.*/ }, {'sort': {'average_rating': -1}});
+		
+		cursor.each(function(err, movie) {
+			if(err) throw err;
+			if(movie != null){
+				console.log('\n' + util.inspect(movie, false, null));
+				var divId = sanitize(movie.id)
+				html+= '<div style="display: inline;" id="'+divId+'"><img src="'+movie.box_art['197']+'" alt="'+movie.title.regular+'"/>';
+				
+				// html += '<script src="http://jsapi.netflix.com/us/api/js/api.js">';
+				// html+= '{';
+				// html+= '"title_id" : "'+movie.id+'",';
+				// html+= '"button_type" : ["PLAY_BUTTON", "ADD_BUTTON"],';
+				// html+= '"show_logo" : "false",';
+				// html+= '"x" : "40",';
+				// html+= '"y" : "20",';
+				// html+= '"dom_id" : "'+divId+'",';
+				// html+= '"application_id" : "my_consumer_key"';
+				// html+= '}';
+				// html+= '</script></div>';
+			}
 		});
 	});
-	
-	// var movie = {};
-	// db.collection('netflixfull', {safe:true}, function(err, collection) {
-	// });
+	html+= '</body></html>'
 	
 	http.createServer(function (req, res) {
 	  res.writeHead(200, {'Content-Type': 'text/html'});
-	  res.end('<!DOCTYPE html><html><body><p>'
-		+'<h1>'+movie.title.regular+'</h1>'
-		+'<img src="'+movie.box_art['197']+'"/>'
-		+'<h3>'+movie.average_rating+'</h3>'
-		+'<h3>'+movie.release_year+'</h3>'
-		+'</p></body></html>');
+	  res.end(html);
 	}).listen(1337, '127.0.0.1');
 	console.log('Listening on http://127.0.0.1:1337/ ...');
+	
+	db.close();
   }
 });

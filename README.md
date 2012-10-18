@@ -22,3 +22,7 @@ http://developer.netflix.com/page/Netflix_API_20_Release_Notes#full_catalog
 http://developer.netflix.com/blog
 
 see also https://github.com/Leonidas-from-XIV/node-xml2js for XML to JSON
+
+### TODO
+
+   * Streaming videos don't all seem to have 197px wide covers.
