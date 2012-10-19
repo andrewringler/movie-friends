@@ -17,3 +17,7 @@ npm-debug.log
 /data
 auth.json
 config.json
+
+.DS_Store
+moviefriends-app/public/gen
+*.swp

@@ -1,0 +1,13 @@
+<Title:>
+  Movies
+
+<Header:>
+  <!-- This is a component defined in the /ui directory -->
+  <ui:connectionAlert>
+
+<Body:>
+  <h1>Movies</h1>
+  
+  {#each _movies.list as :movie}
+  	<div style="display: inline;"><img src="{:movie.box_art.197}" alt="{:movie.title.regular}" /></div>
+  {/}
