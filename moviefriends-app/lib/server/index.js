@@ -5,15 +5,16 @@ var http = require('http')
   , derby = require('derby')
   , app = require('../app')
   , serverError = require('./serverError')
-
+  , netflix = require('./netflix');
 
 // SERVER CONFIGURATION //
 
 var expressApp = express()
   , server = module.exports = http.createServer(expressApp)
 
-derby.use(derby.logPlugin)
-var store = derby.createStore({listen: server})
+derby.use(derby.logPlugin);
+var store = derby.createStore({listen: server});
+netflix.setup(store);
 
 var ONE_YEAR = 1000 * 60 * 60 * 24 * 365
   , root = path.dirname(path.dirname(__dirname))

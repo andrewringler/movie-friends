@@ -6,7 +6,13 @@
   "dependencies": {
     "derby": "*",
     "express": "3.0.0beta4",
-    "gzippo": ">=0.1.7"
+    "gzippo": ">=0.1.7",
+    
+    "oauthsimple": "latest",
+		"request": "latest",
+	  "xml-stream": "latest",
+	  "underscore": "latest",
+	  "mongodb": "latest"
   },
   "private": true
 }
